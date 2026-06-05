@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Check basic security hygiene for a local repository."""
+"""Check basic security hygiene for a local repository or GitHub URL."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import re
+import subprocess
 import sys
+import tempfile
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable
+from urllib.parse import urlparse
 
 
 SKIP_DIRS = {
@@ -101,6 +104,7 @@ class Report:
     path: str
     score: int
     findings: list[Finding]
+    source: str | None = None
 
 
 def has_any_file(root: Path, candidates: Iterable[str]) -> bool:
@@ -134,6 +138,32 @@ def read_text_safely(path: Path, max_bytes: int = 1_000_000) -> str | None:
         return path.read_text(encoding="utf-8", errors="ignore")
     except OSError:
         return None
+
+
+def normalize_github_url(value: str) -> str | None:
+    """Return a cloneable GitHub URL when the input looks like one."""
+    value = value.strip()
+
+    ssh_match = re.fullmatch(r"git@github\.com:([A-Za-z0-9_.-]+)/([A-Za-z0-9_.-]+?)(?:\.git)?", value)
+    if ssh_match:
+        owner, repo = ssh_match.groups()
+        return f"git@github.com:{owner}/{repo}.git"
+
+    parsed = urlparse(value if "://" in value else f"https://{value}")
+    if parsed.netloc.lower() != "github.com":
+        return None
+
+    parts = [part for part in parsed.path.split("/") if part]
+    if len(parts) < 2:
+        return None
+
+    owner = parts[0]
+    repo = parts[1].removesuffix(".git")
+    valid_name = re.compile(r"^[A-Za-z0-9_.-]+$")
+    if not valid_name.fullmatch(owner) or not valid_name.fullmatch(repo):
+        return None
+
+    return f"https://github.com/{owner}/{repo}.git"
 
 
 def check_basic_files(root: Path) -> list[Finding]:
@@ -324,7 +354,7 @@ def calculate_score(findings: list[Finding]) -> int:
     return max(0, 100 - penalty)
 
 
-def run_checks(root: Path) -> Report:
+def run_checks(root: Path, source: str | None = None) -> Report:
     root = root.resolve()
     findings: list[Finding] = []
     findings.extend(check_basic_files(root))
@@ -332,18 +362,55 @@ def run_checks(root: Path) -> Report:
     findings.extend(check_secret_patterns(root))
     findings.extend(check_dependency_security(root))
     findings.extend(check_github_actions(root))
-    return Report(path=str(root), score=calculate_score(findings), findings=findings)
+    return Report(path=str(root), score=calculate_score(findings), findings=findings, source=source)
+
+
+def clone_repository(url: str, destination_root: Path) -> Path:
+    destination = destination_root / "repo"
+    try:
+        subprocess.run(
+            ["git", "clone", "--depth", "1", url, str(destination)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except FileNotFoundError as exc:
+        raise RuntimeError("git is not installed or not available in PATH.") from exc
+    except subprocess.CalledProcessError as exc:
+        error = exc.stderr.strip() or exc.stdout.strip() or "unknown git clone error"
+        raise RuntimeError(f"failed to clone repository: {error}") from exc
+    return destination
+
+
+def scan_target(target: str) -> Report:
+    github_url = normalize_github_url(target)
+    if github_url is not None:
+        with tempfile.TemporaryDirectory(prefix="repo-security-checker-") as directory:
+            clone_path = clone_repository(github_url, Path(directory))
+            return run_checks(clone_path, source=github_url)
+
+    root = Path(target)
+    if not root.exists() or not root.is_dir():
+        raise ValueError(f"{target} is not a directory or supported GitHub URL")
+
+    return run_checks(root)
 
 
 def render_text(report: Report) -> str:
     lines = [
         "# Repository Security Check",
         "",
-        f"Path: {report.path}",
-        f"Score: {report.score}/100",
-        f"Findings: {len(report.findings)}",
-        "",
     ]
+    if report.source:
+        lines.append(f"Source: {report.source}")
+    lines.extend(
+        [
+            f"Scanned path: {report.path}",
+            f"Score: {report.score}/100",
+            f"Findings: {len(report.findings)}",
+            "",
+        ]
+    )
 
     if not report.findings:
         lines.append("No findings. Basic repository hygiene looks good.")
@@ -366,8 +433,13 @@ def render_text(report: Report) -> str:
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Check basic security hygiene for a local repository.")
-    parser.add_argument("path", nargs="?", default=".", help="Repository path to scan. Defaults to current directory.")
+    parser = argparse.ArgumentParser(description="Check basic security hygiene for a local repository or GitHub URL.")
+    parser.add_argument(
+        "target",
+        nargs="?",
+        default=".",
+        help="Repository path or GitHub URL to scan. Defaults to current directory.",
+    )
     parser.add_argument(
         "--format",
         choices=["text", "json"],
@@ -393,13 +465,13 @@ def should_fail(findings: list[Finding], threshold: str) -> bool:
 
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
-    root = Path(args.path)
 
-    if not root.exists() or not root.is_dir():
-        print(f"error: {root} is not a directory", file=sys.stderr)
+    try:
+        report = scan_target(args.target)
+    except (RuntimeError, ValueError) as exc:
+        print(f"error: {exc}", file=sys.stderr)
         return 2
 
-    report = run_checks(root)
     if args.format == "json":
         print(json.dumps(asdict(report), indent=2))
     else:
@@ -410,4 +482,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

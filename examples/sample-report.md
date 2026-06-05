@@ -1,6 +1,6 @@
 # Repository Security Check
 
-Path: /example/insecure-repo
+Scanned path: /example/insecure-repo
 Score: 63/100
 Findings: 3
 
@@ -21,4 +21,3 @@ Findings: 3
 - Check: `missing-license`
 - Detail: No top-level license file was found.
 - Recommendation: Add a license if this repository will be public.
-

@@ -19,6 +19,7 @@ The goal is to stay beginner-friendly while still producing something useful eno
 ├── docs/
 │   ├── labs.md
 │   ├── learning-roadmap.md
+│   ├── pre-push-security-checks.md
 │   └── tools.md
 ├── examples/
 │   └── sample-report.md
@@ -45,6 +46,12 @@ Run it against this starter kit:
 python3 repo-security-checker/check_repo_security.py .
 ```
 
+Run it against a public GitHub repository URL:
+
+```bash
+python3 repo-security-checker/check_repo_security.py https://github.com/owner/repo
+```
+
 Run tests:
 
 ```bash
@@ -57,12 +64,12 @@ Start with [docs/learning-roadmap.md](docs/learning-roadmap.md), then use:
 
 - [docs/tools.md](docs/tools.md) to learn common defensive and AppSec tools.
 - [docs/labs.md](docs/labs.md) to find safe practice environments.
+- [docs/pre-push-security-checks.md](docs/pre-push-security-checks.md) to understand what you can check before pushing to GitHub.
 - [checklists/github-repo-security.md](checklists/github-repo-security.md) to review repository hygiene.
 - [checklists/web-app-security.md](checklists/web-app-security.md) to review common web app risks.
 
 ## Project Ideas To Extend
 
-- Add JSON output to the repo checker.
 - Add scoring by severity.
 - Add checks for Dependabot, CodeQL, or secret scanning configuration.
 - Add a `docs/writeups/` folder for PortSwigger Academy or OWASP Juice Shop notes.
@@ -71,4 +78,3 @@ Start with [docs/learning-roadmap.md](docs/learning-roadmap.md), then use:
 ## Safety Note
 
 This repository is focused on learning, defensive security, and authorized testing. Only test systems you own or have explicit permission to assess.
-
