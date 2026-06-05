@@ -9,6 +9,8 @@ This project has two parts:
 
 The goal is to stay beginner-friendly while still producing something useful enough to share on GitHub.
 
+For a Traditional Chinese explanation of what this project does, see [PROJECT_OVERVIEW.zh-TW.md](PROJECT_OVERVIEW.zh-TW.md).
+
 ## What's Inside
 
 ```text
