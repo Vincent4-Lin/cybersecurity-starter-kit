@@ -63,6 +63,12 @@ Findings: 0
 sh scripts/install-pre-push-hook.sh
 ```
 
+如果是在 Windows PowerShell：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-pre-push-hook.ps1
+```
+
 安裝後，每次你執行：
 
 ```bash
@@ -170,7 +176,8 @@ repo-security-checker/
   README.md                    工具使用說明
 
 scripts/
-  install-pre-push-hook.sh     安裝本機 pre-push hook
+  install-pre-push-hook.sh     macOS / Linux / Git Bash 用的 hook 安裝器
+  install-pre-push-hook.ps1    Windows PowerShell 用的 hook 安裝器
 
 tests/
   test_check_repo_security.py  單元測試

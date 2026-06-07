@@ -54,6 +54,12 @@ Install the pre-push hook so Git runs the checker automatically before `git push
 sh scripts/install-pre-push-hook.sh
 ```
 
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-pre-push-hook.ps1
+```
+
 Run it against a public GitHub repository URL:
 
 ```bash

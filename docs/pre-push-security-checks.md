@@ -27,6 +27,12 @@ Or install the Git pre-push hook:
 sh scripts/install-pre-push-hook.sh
 ```
 
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-pre-push-hook.ps1
+```
+
 After that, Git runs the checker automatically before every `git push` from this local clone.
 
 This project checks:

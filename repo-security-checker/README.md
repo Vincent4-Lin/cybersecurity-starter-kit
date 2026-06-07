@@ -36,6 +36,12 @@ Install a local Git pre-push hook:
 sh scripts/install-pre-push-hook.sh
 ```
 
+On Windows PowerShell:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/install-pre-push-hook.ps1
+```
+
 After installation, every `git push` from this local repository runs:
 
 ```bash
