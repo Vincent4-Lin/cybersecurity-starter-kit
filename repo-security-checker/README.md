@@ -30,6 +30,20 @@ Fail CI on high severity findings:
 python3 repo-security-checker/check_repo_security.py . --fail-on high
 ```
 
+Install a local Git pre-push hook:
+
+```bash
+sh scripts/install-pre-push-hook.sh
+```
+
+After installation, every `git push` from this local repository runs:
+
+```bash
+python3 repo-security-checker/check_repo_security.py . --fail-on high
+```
+
+If a high severity finding is detected, Git cancels the push.
+
 ## Checks
 
 - Missing `README.md`.

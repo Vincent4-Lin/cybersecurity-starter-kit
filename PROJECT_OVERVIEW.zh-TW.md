@@ -57,6 +57,22 @@ Findings: 0
 
 代表目前沒有發現基本安全問題。
 
+也可以安裝 pre-push hook：
+
+```bash
+sh scripts/install-pre-push-hook.sh
+```
+
+安裝後，每次你執行：
+
+```bash
+git push
+```
+
+Git 都會先自動跑安全檢查。
+
+如果檢查發現 high 風險問題，就會取消 push。
+
 ### 2. 檢查 GitHub 上的公開 repo
 
 也可以直接輸入 GitHub URL：
@@ -153,6 +169,9 @@ repo-security-checker/
   check_repo_security.py       主要檢查工具
   README.md                    工具使用說明
 
+scripts/
+  install-pre-push-hook.sh     安裝本機 pre-push hook
+
 tests/
   test_check_repo_security.py  單元測試
 ```
@@ -176,4 +195,3 @@ tests/
 幫使用者在 push GitHub 前，先檢查 repo 有沒有基本安全問題，
 同時整理資安學習路線和工具資料。
 ```
-

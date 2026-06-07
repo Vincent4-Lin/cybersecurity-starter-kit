@@ -21,6 +21,14 @@ Run a local check before you upload code:
 python3 repo-security-checker/check_repo_security.py .
 ```
 
+Or install the Git pre-push hook:
+
+```bash
+sh scripts/install-pre-push-hook.sh
+```
+
+After that, Git runs the checker automatically before every `git push` from this local clone.
+
 This project checks:
 
 - Whether basic public repo files exist: `README.md`, `LICENSE`, `SECURITY.md`, `.gitignore`.
@@ -49,10 +57,13 @@ Before push:
   Run this local checker.
   Remove obvious risky files and missing security basics.
 
+Optional automation:
+  Install the pre-push hook.
+  Git runs the checker automatically before push.
+
 During push:
   GitHub push protection may block supported secrets.
 
 After push:
   Dependabot, CodeQL, and GitHub Actions can keep checking over time.
 ```
-

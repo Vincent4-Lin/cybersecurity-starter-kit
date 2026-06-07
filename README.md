@@ -48,6 +48,12 @@ Run it against this starter kit:
 python3 repo-security-checker/check_repo_security.py .
 ```
 
+Install the pre-push hook so Git runs the checker automatically before `git push`:
+
+```bash
+sh scripts/install-pre-push-hook.sh
+```
+
 Run it against a public GitHub repository URL:
 
 ```bash
