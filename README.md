@@ -11,6 +11,12 @@ The goal is to stay beginner-friendly while still producing something useful eno
 
 For a Traditional Chinese explanation of what this project does, see [PROJECT_OVERVIEW.zh-TW.md](PROJECT_OVERVIEW.zh-TW.md).
 
+## Portfolio Position
+
+This repository is the learning and repository-hygiene layer of my portfolio. It is not a main research prototype like [ai-soc-analyst](https://github.com/Vincent4-Lin/ai-soc-analyst). Instead, it shows my study roadmap, basic security checklists, and a practical Python checker for GitHub-style repository hygiene.
+
+It supports the larger portfolio by documenting the foundations behind my defensive security projects.
+
 ## What's Inside
 
 ```text
